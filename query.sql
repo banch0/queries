@@ -58,8 +58,13 @@ SELECT s.id, s.price, m.name, p.name FROM sales AS s
     JOIN products p ON s.product_id = p.id;
 
 -- 2. Cосчитать, сколько (количество) продаж сделал каждый менеджер
-SELECT m.name, count(s.manager_id) FROM managers AS m 
-    JOIN sales s ON m.id = s.manager_id GROUP BY m.name;
+SELECT m.name, ifnull(st.total, 0) FROM managers m
+    LEFT JOIN (
+        SELECT s.manager_id, count(s.manager_id) total
+        FROM sales s
+            GROUP BY s.manager_id
+        ) st
+                   ON m.id = st.manager_id;
 
 -- 3. Cосчитать, на сколько (общая сумма) продал каждый менеджер
 SELECT m.name, ifnull(st.total, 0) from managers as m 
