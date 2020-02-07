@@ -62,8 +62,11 @@ SELECT m.name, count(s.manager_id) FROM managers AS m
     JOIN sales s ON m.id = s.manager_id GROUP BY m.name;
 
 -- 3. Cосчитать, на сколько (общая сумма) продал каждый менеджер
-SELECT m.name, sum(s.price * s.qty) FROM managers AS m 
-    JOIN sales s ON m.id = s.manager_id GROUP BY m.name;
+SELECT m.name, ifnull(st.total, 0) from managers as m 
+    LEFT JOIN (
+        SELECT s.manager_id, sum(s.price * s.qty) total FROM sales s 
+            GROUP BY s.manager_id) st 
+                ON m.id = st.manager_id;
 
 -- 4. Cосчитать, на сколько (общая сумма) продано каждого товара
 SELECT p.name, sum(s.price * s.qty) 
